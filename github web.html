@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Taybii Archives</title>
+    
+    <!-- Tailwind CSS v4 CDN -->
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+        :root {
+            --ios-blue: #007AFF;
+            --ios-blue-dark: #0A84FF;
+            --ios-bg-light: #F2F2F7;
+            --ios-bg-dark: #000000;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            background-color: var(--ios-bg-light);
+            transition: background-color 0.4s ease;
+        }
+
+        html.dark body {
+            background-color: var(--ios-bg-dark);
+        }
+
+        /* Pure B/W/Blue Colors */
+        .text-primary { color: #000000; }
+        html.dark .text-primary { color: #FFFFFF; }
+        
+        .text-secondary { color: #6C6C70; }
+        html.dark .text-secondary { color: #98989D; }
+
+        .bg-blue-btn { background-color: var(--ios-blue); color: #FFFFFF; }
+        html.dark .bg-blue-btn { background-color: var(--ios-blue-dark); color: #FFFFFF; }
+
+        .text-blue-accent { color: var(--ios-blue); }
+        html.dark .text-blue-accent { color: var(--ios-blue-dark); }
+
+        /* Premium iOS Glassmorphism */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(40px) saturate(200%);
+            -webkit-backdrop-filter: blur(40px) saturate(200%);
+            border: 0.5px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 8px 32px -8px rgba(0, 0, 0, 0.08);
+        }
+
+        html.dark .glass-panel {
+            background: rgba(28, 28, 30, 0.65);
+            border: 0.5px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px -8px rgba(0, 0, 0, 0.4);
+        }
+
+        /* iOS Segmented Control (Filters) */
+        .segmented-control {
+            background: rgba(118, 118, 128, 0.12);
+            padding: 3px;
+            border-radius: 999px;
+            display: inline-flex;
+        }
+        html.dark .segmented-control {
+            background: rgba(118, 118, 128, 0.24);
+        }
+
+        .filter-btn {
+            color: #000000;
+            font-weight: 500;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        html.dark .filter-btn { color: #FFFFFF; }
+
+        .filter-active {
+            background: #FFFFFF;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12), 0 3px 1px rgba(0, 0, 0, 0.04);
+            color: #000000 !important;
+        }
+        html.dark .filter-active {
+            background: #636366;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+            color: #FFFFFF !important;
+        }
+
+        /* Search Input */
+        .search-box {
+            background: rgba(118, 118, 128, 0.12);
+            border-radius: 12px;
+        }
+        html.dark .search-box { background: rgba(118, 118, 128, 0.24); }
+
+        /* Animations */
+        .active-scale:active { transform: scale(0.95); transition: transform 0.1s; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-card {
+            opacity: 0;
+            animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen pb-32 pt-6 selection:bg-blue-500/30">
+
+    <!-- Sticky Header -->
+    <header class="sticky top-4 z-40 max-w-5xl mx-auto px-4 mb-6">
+        <div class="glass-panel rounded-full px-5 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-full bg-black dark:bg-white flex items-center justify-center text-white dark:text-black shadow-sm">
+                    <i class="fa-solid fa-bookmark text-sm"></i>
+                </div>
+                <div class="flex flex-col justify-center">
+                    <span class="font-bold tracking-tight leading-tight text-primary">Taybii Archives</span>
+                    <span class="text-[10px] font-semibold text-blue-accent uppercase tracking-wider">Premium Access</span>
+                </div>
+            </div>
+            <button id="themeToggle" class="active-scale w-9 h-9 rounded-full bg-black/5 dark:bg-white/10 flex items-center justify-center text-primary transition-colors">
+                <i class="fa-solid fa-moon dark:hidden text-sm"></i>
+                <i class="fa-solid fa-sun hidden dark:block text-sm"></i>
+            </button>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-4">
+        
+        <!-- Search & Filter Controls -->
+        <section class="mb-8 space-y-5">
+            <!-- Large Header -->
+            <div>
+                <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight text-primary mb-1">Library</h1>
+                <p class="text-sm text-secondary font-medium">Discover Islamic history, manuscripts, and scripts.</p>
+            </div>
+
+            <!-- Native iOS Search Bar -->
+            <div class="search-box flex items-center px-3 py-2.5 relative">
+                <i class="fa-solid fa-magnifying-glass text-secondary ml-1 mr-2 text-sm"></i>
+                <input type="text" id="searchInput" placeholder="Search" 
+                    class="w-full bg-transparent border-none outline-none text-[17px] text-primary placeholder:text-[#3C3C43]/60 dark:placeholder:text-[#EBEBF5]/60">
+                <button id="clearSearch" class="active-scale w-5 h-5 rounded-full bg-black/20 dark:bg-white/20 flex items-center justify-center text-white hidden">
+                    <i class="fa-solid fa-xmark text-[10px]"></i>
+                </button>
+            </div>
+
+            <!-- iOS Segmented Control -->
+            <div class="w-full overflow-x-auto no-scrollbar">
+                <div class="segmented-control w-max" id="filterContainer">
+                    <button class="filter-btn filter-active active-scale px-6 py-1.5 rounded-full text-[13px]" data-filter="all">All</button>
+                    <button class="filter-btn active-scale px-6 py-1.5 rounded-full text-[13px]" data-filter="scripts">Scripts</button>
+                    <button class="filter-btn active-scale px-6 py-1.5 rounded-full text-[13px]" data-filter="history">History</button>
+                    <button class="filter-btn active-scale px-6 py-1.5 rounded-full text-[13px]" data-filter="books">Books</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dynamic Content Grid -->
+        <section id="contentGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></section>
+
+        <!-- Empty State -->
+        <div id="noResults" class="hidden text-center py-16">
+            <div class="w-16 h-16 rounded-full bg-black/5 dark:bg-white/10 flex items-center justify-center text-secondary mx-auto mb-4">
+                <i class="fa-solid fa-magnifying-glass text-2xl"></i>
+            </div>
+            <h3 class="text-lg font-bold text-primary mb-1">No results found</h3>
+            <p class="text-sm text-secondary">Check the spelling or try a new search.</p>
+        </div>
+    </main>
+
+    <!-- Floating Action Dock -->
+    <div class="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 w-max">
+        <div class="glass-panel rounded-full px-8 py-3 flex items-center gap-10">
+            
+            <!-- Home Button -->
+            <button onclick="window.scrollTo(0,0)" class="active-scale flex flex-col items-center gap-1 text-primary">
+                <i class="fa-solid fa-house text-[20px]"></i>
+            </button>
+            
+            <!-- TikTok Link -->
+            <a href="https://www.tiktok.com/@taybii.vibes" target="_blank" class="active-scale flex flex-col items-center gap-1 text-secondary hover:text-primary transition-colors">
+                <i class="fa-brands fa-tiktok text-[20px]"></i>
+            </a>
+            
+            <!-- YouTube Link -->
+            <a href="https://youtube.com/@taybiivibesofficial?si=YMnPDAV1lCeWj7b3" target="_blank" class="active-scale flex flex-col items-center gap-1 text-secondary hover:text-primary transition-colors">
+                <i class="fa-brands fa-youtube text-[20px]"></i>
+            </a>
+
+        </div>
+    </div>
+
+    <!-- Reading/Preview Modal -->
+    <div id="previewModal" class="fixed inset-0 z-50 hidden opacity-0 transition-opacity duration-300">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-md" onclick="closePreview()"></div>
+        <div class="absolute inset-x-0 bottom-0 md:top-1/2 md:bottom-auto md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 w-full md:max-w-lg p-0 md:p-4 transform translate-y-full md:translate-y-4 transition-transform duration-400 cubic-bezier(0.16, 1, 0.3, 1)" id="modalInner">
+            
+            <div class="bg-white dark:bg-[#1C1C1E] rounded-t-3xl md:rounded-3xl p-6 shadow-2xl h-[85vh] md:h-auto flex flex-col">
+                <!-- Mobile Drag Handle -->
+                <div class="w-10 h-1.5 rounded-full bg-gray-300 dark:bg-gray-600 mx-auto mb-5 md:hidden"></div>
+                
+                <div class="flex justify-between items-start mb-2">
+                    <h3 id="modalTitle" class="text-2xl font-bold text-primary leading-tight">Title</h3>
+                    <button onclick="closePreview()" class="active-scale w-8 h-8 rounded-full bg-black/5 dark:bg-white/10 flex items-center justify-center text-primary shrink-0">
+                        <i class="fa-solid fa-xmark text-sm"></i>
+                    </button>
+                </div>
+                
+                <div class="flex items-center gap-3 mb-6 border-b border-black/5 dark:border-white/10 pb-4">
+                    <span id="modalMeta" class="text-[11px] font-bold text-secondary uppercase tracking-widest">TXT • 2 MIN READ</span>
+                </div>
+                
+                <!-- Content Area -->
+                <div id="modalContent" class="text-[15px] leading-relaxed text-primary overflow-y-auto pr-2 whitespace-pre-wrap flex-grow mb-6 font-medium font-serif"></div>
+                
+                <!-- Action Buttons -->
+                <div class="flex gap-3 pt-2 bg-white dark:bg-[#1C1C1E]">
+                    <button id="copyBtn" onclick="copyModalContent()" class="active-scale flex-1 bg-black/5 dark:bg-white/10 py-3.5 rounded-xl text-center font-semibold text-primary text-[15px]">
+                        <i class="fa-regular fa-copy mr-2"></i> Copy Script
+                    </button>
+                    <a id="modalDownloadBtn" href="#" class="active-scale flex-1 bg-blue-btn py-3.5 rounded-xl text-center font-semibold text-[15px] shadow-sm">
+                        <i class="fa-solid fa-arrow-down mr-2"></i> Download
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // 📚 CONTENT DATABASE (CMS ARRAY)
+        // ==========================================
+        const CONTENT_DATABASE = [
+            {
+                id: 1,
+                category: "scripts",
+                format: "TXT",
+                date: "Sep 13, 2026",
+                readTime: "1 min read",
+                icon: "fa-file-lines",
+                title: "Woh Aankhon Ki Khayanat",
+                description: "Short script focusing on divine knowledge and absolute truth.",
+                fullText: "Woh aankhon ki khayanat ko jaanta hai.\n\nAur jo baatein seenon mein posheeda hain, un ko bhi.\n\nAur Allah sachai ke saath faisla farmata hai.\n\nAur jin ko yeh log pukarte hain, woh kuch bhi faisla nahi kar sakte.\n\nBeshak Allah sunne wala hai. Dekhne wala hai.",
+                downloadLink: "#link-1"
+            },
+            {
+                id: 2,
+                category: "scripts",
+                format: "SRT",
+                date: "Sep 10, 2026",
+                readTime: "2 min read",
+                icon: "fa-microphone-lines",
+                title: "Love & Marriage in Islam",
+                description: "Addressing love marriage through Rasul Allah ﷺ and Hazrat Khadija (RA).",
+                fullText: "Aik baat aaj kal bohat kahi jaati hai ke agar Islam mein larke aur larki ki mohabbat ya pasand ko itna ghalat samjha jaata hai, to phir Rasul Allah ﷺ aur Hazrat Khadija (RA) ki shaadi bhi to mohabbat ki bunyaad par hui thi.\n\nTo kya woh bhi ek love marriage nahi thi?\n\nYeh sawaal apni jagah samajhne wala sawaal hai, aur iska jawab bhi humein poori izzat aur mohabbat ke saath dena chahiye...",
+                downloadLink: "#link-2"
+            },
+            {
+                id: 3,
+                category: "history",
+                format: "PDF",
+                date: "Aug 22, 2026",
+                readTime: "4.2 MB",
+                icon: "fa-book-quran",
+                title: "Seerat-un-Nabi (Vol 1)",
+                description: "Complete historical biography and chronological timeline.",
+                fullText: "A comprehensive digital manuscript detailing the early life, revelations, and chronological events of Islamic history based on authentic sources. This volume covers the Makkan period in extreme detail.\n\nFormat: High-Quality PDF\nPages: 450",
+                downloadLink: "#link-3"
+            }
+        ];
+
+        // ==========================================
+        // ⚙️ CORE ENGINE
+        // ==========================================
+        const grid = document.getElementById('contentGrid');
+        
+        function renderPosts(data) {
+            grid.innerHTML = '';
+            data.forEach((post, index) => {
+                const card = document.createElement('article');
+                // Apply staggered animation delay based on index
+                card.className = `content-card glass-panel rounded-3xl p-5 flex flex-col h-full animate-card`;
+                card.style.animationDelay = `${index * 0.08}s`;
+                card.setAttribute('data-category', post.category);
+                card.setAttribute('data-title', post.title);
+                card.setAttribute('data-desc', post.description);
+                
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-5">
+                        <div class="w-12 h-12 rounded-2xl bg-black/5 dark:bg-white/10 flex items-center justify-center text-primary text-xl">
+                            <i class="fa-solid ${post.icon}"></i>
+                        </div>
+                        <div class="text-right">
+                            <span class="block text-[10px] font-bold uppercase tracking-wider text-secondary">${post.format}</span>
+                            <span class="block text-[11px] font-medium text-secondary mt-0.5">${post.date}</span>
+                        </div>
+                    </div>
+                    <div class="mb-5 flex-grow">
+                        <h3 class="text-[19px] font-bold mb-1.5 leading-tight text-primary tracking-tight">${post.title}</h3>
+                        <p class="text-[14px] text-secondary line-clamp-2 leading-relaxed">${post.description}</p>
+                    </div>
+                    <div class="flex gap-2.5 mt-auto">
+                        <button onclick="openPreview(${post.id})" class="active-scale flex-1 bg-black/5 dark:bg-white/10 py-2.5 rounded-xl text-[14px] font-semibold text-primary transition-colors">Read</button>
+                        <a href="${post.downloadLink}" class="active-scale w-12 bg-blue-btn flex items-center justify-center rounded-xl shadow-sm"><i class="fa-solid fa-arrow-down text-sm"></i></a>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+        
+        renderPosts(CONTENT_DATABASE);
+
+        // Theme Toggle
+        const themeToggleBtn = document.getElementById('themeToggle');
+        const htmlElement = document.documentElement;
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            htmlElement.classList.add('dark');
+        }
+        themeToggleBtn.addEventListener('click', () => {
+            htmlElement.classList.toggle('dark');
+            localStorage.setItem('theme', htmlElement.classList.contains('dark') ? 'dark' : 'light');
+        });
+
+        // Search & Filter System
+        const searchInput = document.getElementById('searchInput');
+        const clearSearchBtn = document.getElementById('clearSearch');
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const noResults = document.getElementById('noResults');
+        let activeCategory = 'all';
+
+        function filterContent() {
+            const query = searchInput.value.toLowerCase();
+            const cards = document.querySelectorAll('.content-card');
+            let visibleCount = 0;
+
+            clearSearchBtn.classList.toggle('hidden', query.length === 0);
+
+            cards.forEach(card => {
+                const title = card.getAttribute('data-title').toLowerCase();
+                const desc = card.getAttribute('data-desc').toLowerCase();
+                const category = card.getAttribute('data-category');
+                
+                const matchesSearch = title.includes(query) || desc.includes(query);
+                const matchesCategory = activeCategory === 'all' || category === activeCategory;
+
+                if (matchesSearch && matchesCategory) {
+                    card.style.display = 'flex';
+                    // Re-trigger animation
+                    card.style.animation = 'none';
+                    card.offsetHeight; /* trigger reflow */
+                    card.style.animation = null; 
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            noResults.classList.toggle('hidden', visibleCount > 0);
+        }
+
+        searchInput.addEventListener('input', filterContent);
+        clearSearchBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            filterContent();
+            searchInput.focus();
+        });
+
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                filterBtns.forEach(b => b.classList.remove('filter-active'));
+                e.target.classList.add('filter-active');
+                activeCategory = e.target.getAttribute('data-filter');
+                filterContent();
+            });
+        });
+
+        // Modal Engine & Copy Feature
+        const modal = document.getElementById('previewModal');
+        const modalInner = document.getElementById('modalInner');
+        
+        window.openPreview = function(id) {
+            const post = CONTENT_DATABASE.find(p => p.id === id);
+            if(!post) return;
+            
+            document.getElementById('modalTitle').innerText = post.title;
+            document.getElementById('modalMeta').innerText = `${post.format} • ${post.readTime}`;
+            document.getElementById('modalContent').innerText = post.fullText;
+            document.getElementById('modalDownloadBtn').href = post.downloadLink;
+            
+            // Reset copy button text
+            document.getElementById('copyBtn').innerHTML = '<i class="fa-regular fa-copy mr-2"></i> Copy Script';
+            
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                if(window.innerWidth < 768) {
+                    modalInner.classList.remove('translate-y-full'); // Mobile slide up
+                } else {
+                    modalInner.classList.remove('md:translate-y-4'); // Desktop fade/scale
+                    modalInner.classList.add('md:translate-y-0');
+                }
+            }, 10);
+            document.body.style.overflow = 'hidden';
+        }
+
+        window.closePreview = function() {
+            modal.classList.add('opacity-0');
+            if(window.innerWidth < 768) {
+                modalInner.classList.add('translate-y-full');
+            } else {
+                modalInner.classList.remove('md:translate-y-0');
+                modalInner.classList.add('md:translate-y-4');
+            }
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }, 300);
+        }
+
+        window.copyModalContent = function() {
+            const text = document.getElementById('modalContent').innerText;
+            navigator.clipboard.writeText(text);
+            const copyBtn = document.getElementById('copyBtn');
+            copyBtn.innerHTML = '<i class="fa-solid fa-check mr-2"></i> Copied!';
+            setTimeout(() => {
+                copyBtn.innerHTML = '<i class="fa-regular fa-copy mr-2"></i> Copy Script';
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
